@@ -1,5 +1,5 @@
 ---
-title: "Golang testing with external dependency"
+title: "Golang: Testing Unreachable Dependencies"
 date: 2023-08-29T08:28:50+02:00
 draft: false
 ---

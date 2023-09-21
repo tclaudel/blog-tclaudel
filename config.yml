@@ -3,11 +3,27 @@ languageCode: 'en-us'
 title: 'Tclaudel'
 theme: 'PaperMod'
 
+languages:
+  en:
+    languageName: English
+    weight: 1
+    params:
+      homeInfoParams:
+        Title: Hi there 👋
+        Content: I'm Thomas, a software engineer from France.
+  fr:
+    languageName: Français
+    weight: 2
+    params:
+      homeInfoParams:
+        Title: Salut à toi 👋
+        Content: Je suis Thomas, un ingénieur logiciel de France.
+
 params:
   env: production
   title: 'Tclaudel'
   description: 'Tclaudel blog'
-  keyword: [Blog]
+  keyword: [ Blog ]
   author: 'Thomas CLAUDEL'
   DateFormat: 'January 2, 2006'
   defaultTheme: auto
@@ -23,10 +39,6 @@ params:
   hideSummary: false
   showtoc: true
   tocopen: true
-
-  homeInfoParams:
-    Title: Hi there 👋
-    Content: I'm Thomas, a software engineer from France.
 
   socialIcons:
     - name: linkedin

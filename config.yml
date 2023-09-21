@@ -1,0 +1,37 @@
+baseURL: 'https://tclaudel.fr'
+languageCode: 'en-us'
+title: 'Tclaudel'
+theme: 'PaperMod'
+
+params:
+  env: production
+  title: 'Tclaudel'
+  description: 'Tclaudel blog'
+  keyword: [Blog]
+  author: 'Thomas CLAUDEL'
+  DateFormat: 'January 2, 2006'
+  defaultTheme: auto
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  UseHugoToc: true
+  comments: true
+  hideSummary: false
+  showtoc: true
+  tocopen: true
+
+  homeInfoParams:
+    Title: Hi there 👋
+    Content: I'm Thomas, a software engineer from France.
+
+  socialIcons:
+    - name: linkedin
+      url: 'https://www.linkedin.com/in/thomas-claudel/'
+    - name: github
+      url: 'https://github.com/tclaudel'
+    - name: twitter
+      url: 'https://x.com/_tclaudel'

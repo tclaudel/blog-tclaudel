@@ -42,12 +42,12 @@ interactions. This bifurcation translates into:
 - **Scalability**: As the software expands, this clear separation ensures that integrating new external components or
   modifying existing ones doesn't call for extensive refactoring.
 
-# The Humble Object in Action
+## The Humble Object in Action
 
 Let's explore the Humble Object pattern by building a simple application that fetches data from a database and
 performs some business logic on it. We'll then test this application using the Humble Object pattern.
 
-## The Application
+### The Application
 
 Our application will be a simple Go program that fetches data from a database and performs some business logic on it.
 

@@ -2,6 +2,7 @@ baseURL: 'https://tclaudel.fr'
 languageCode: 'en-us'
 title: 'Tclaudel'
 theme: 'PaperMod'
+customCSS: 'styles.css'
 
 languages:
   en:

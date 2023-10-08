@@ -35,4 +35,90 @@ It must not depend on anything. It must be completely independent of the outside
 
 **⚠️ NO INFRASTRUCTURE CODE IN THE DOMAIN. ⚠️**
 
-![Domain](./images/content/hexagonal_architecture_with_go/domain.png)
+By dependencies, We consider Web framework, Database clients, libraries etc.
+
+![Domain](/images/content/hexagonal_architecture_with_go/domain.png)
+
+He is the example of a model inside the core :
+
+```bash
+.
+└── internal
+    └── domain
+        └── entity
+            └── user.go
+```
+
+```go
+package entity
+
+import (
+	"errors"
+	"fmt"
+	"net/mail"
+
+	"github.com/google/uuid"
+)
+
+var (
+	// ErrInvalidUserID is returned when the user id is invalid
+	ErrInvalidUserID = errors.New("invalid user id")
+	// ErrInvalidEmail is returned when the email is invalid
+	ErrInvalidEmail = errors.New("invalid email")
+	// ErrInvalidUsername is returned when the username is invalid
+	ErrInvalidUsername = errors.New("invalid username")
+)
+
+type UserParams struct {
+	ID       string
+	Username string
+	Email    string
+}
+
+// User represents a user
+type User struct {
+	id       uuid.UUID
+	username string
+	email    *mail.Address
+}
+
+// NewUser creates a new user
+func NewUser(params UserParams) (*User, error) {
+	userID, err := uuid.Parse(params.ID)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrInvalidUserID, err.Error())
+	}
+
+	emailAddress, err := mail.ParseAddress(params.Email)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrInvalidEmail, err.Error())
+	}
+
+	if params.Username == "" {
+		return nil, fmt.Errorf("%w: %s", ErrInvalidUsername, "username cannot be empty")
+	}
+
+	return &User{
+		id:       userID,
+		username: params.Username,
+		email:    emailAddress,
+	}, nil
+}
+
+func (u User) ID() uuid.UUID {
+	return u.id
+}
+
+func (u User) Username() string {
+	return u.username
+}
+
+func (u User) Email() *mail.Address {
+	return u.email
+}
+```
+
+## Ports
+
+The ports defines the way the business logic interact with the outside world. They decouple domain and adapters wich 
+hard the next component. In Go language

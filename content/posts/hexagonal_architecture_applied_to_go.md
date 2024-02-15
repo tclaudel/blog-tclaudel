@@ -49,6 +49,8 @@ He is the example of a model inside the core :
             └── user.go
 ```
 
+
+***./internal/domain/entity/user.go__***
 ```go
 package entity
 
@@ -121,4 +123,125 @@ func (u User) Email() *mail.Address {
 ## Ports
 
 The ports defines the way the business logic interact with the outside world. They decouple domain and adapters wich 
-hard the next component. In Go language
+hard the next component. In Golang interface are used for it. We define two kinds of ports : primary/secondary:
+
+![Ports](/images/content/hexagonal_architecture_with_go/ports.png)
+
+```bash
+internal/ports
+├── primary
+│   └── user.go
+└── secondary
+    └── user.go
+```
+
+
+### Primary
+
+They defines the uses for the application, it represents the uses cases and the scenarios  
+They are implemented by the domain
+
+***internal/ports/user.go***
+```go
+package primary
+
+import (
+	"context"
+	"errors"
+
+	"github.com/google/uuid"
+	"github.com/tclaudel/hexagonal-architecture-golang/internal/domain/entity"
+)
+
+var (
+	ErrCreatingUser      = errors.New("error creating user")
+	ErrUserAlreadyExists = errors.New("error user already exists")
+	ErrUpdatingUser      = errors.New("error updating user")
+	ErrRemovingUser      = errors.New("error removing user")
+	ErrRetrievingUser    = errors.New("error retrieving user")
+	ErrRetrievingUsers   = errors.New("error retrieving users")
+	ErrUserNotFound      = errors.New("error user not found")
+)
+
+type UserUseCase interface {
+	CreateUser(ctx context.Context, user *entity.User) error
+	UpdateUser(ctx context.Context, user *entity.User) error
+	RemoveUser(ctx context.Context, id uuid.UUID) error
+	RetrieveUser(ctx context.Context, id uuid.UUID) (*entity.User, error)
+	RetrieveUsers(ctx context.Context) ([]*entity.User, error)
+}
+```
+
+example of an implementation in the domain :
+
+```internal/
+├── domain
+│   ├── entity
+│   │   └── user.go
+│   └── services
+│       ├── user_create.go
+│       ├── user_create_test.go
+│       ├── user_remove.go
+│       ├── user_remove_test.go
+│       ├── user_retrieve.go
+│       ├── user_retrieve_test.go
+│       ├── users_retrieve.go
+│       ├── users_retrieve_test.go
+│       ├── user_update.go
+│       ├── user_update_test.go
+│       └── user_use_case.go
+└── ports
+    ├── primary
+    │   └── user.go
+    └── secondary
+        └── user.go
+```
+
+***domain/services/user_use_case.go***
+```go
+package services
+
+import "github.com/tclaudel/hexagonal-architecture-golang/internal/ports/secondary"
+
+type UserUseCase struct {
+	userRepository secondary.UserRepository
+}
+
+func NewUserUseCase(userRepository secondary.UserRepository) *UserUseCase {
+	return &UserUseCase{
+		userRepository: userRepository,
+	}
+}
+```
+
+***domain/services/user_create.go***
+```go
+package services
+
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"log"
+
+	"github.com/tclaudel/hexagonal-architecture-golang/internal/domain/entity"
+	"github.com/tclaudel/hexagonal-architecture-golang/internal/ports/primary"
+	"github.com/tclaudel/hexagonal-architecture-golang/internal/ports/secondary"
+)
+
+func (u UserUseCase) CreateUser(ctx context.Context, user *entity.User) error {
+	err := u.userRepository.SaveUser(ctx, user)
+	if err != nil {
+		log.Printf("error saving user: %s", err.Error())
+
+		if errors.Is(err, secondary.ErrUserAlreadyExists) {
+			return fmt.Errorf("%w: %s", primary.ErrUserAlreadyExists, err.Error())
+		}
+
+		return fmt.Errorf("%w: %s", primary.ErrCreatingUser, err.Error())
+	}
+
+	return nil
+}
+```

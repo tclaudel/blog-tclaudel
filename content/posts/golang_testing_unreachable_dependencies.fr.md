@@ -1,60 +1,63 @@
 ---
-title: "Golang: Testing Unreachable Dependencies"
+title: "Golang: Tester les Dépendances Inaccessibles"
 date: 2023-08-29T08:28:50+02:00
 draft: false
 ---
-## The Humble Object Design Pattern: Navigating the Challenges of Unit Testing
+## Le Modèle de Conception Humble object : Naviguer à travers les Défis des Tests Unitaires
 
+Dans le paysage évolutif du développement logiciel, le besoin de fiabilité et de maintenabilité du code est primordial.
+Un obstacle constant auquel les développeurs sont confrontés est la tâche complexe des tests unitaires pour du code
+imbriqué avec des composants externes. Pour remédier à cela, la communauté logicielle a introduit une solution
+prometteuse : le modèle de conception *humble object*.
 
-In the evolving landscape of software development, the need for code reliability and maintainability stands paramount. A
-consistent hurdle developers encounter is the intricate task of unit testing code entangled with external components. To
-address this, the software community has introduced a promising solution: The Humble Object design pattern.
+### Le Problème : Code Entremêlé avec des Dépendances Externes
 
-### The Problem: Code Intertwined with External Dependencies
+Considérez le scénario du développement logiciel où votre logique est profondément intégrée avec des interfaces
+utilisateur, des bases de données, des systèmes de fichiers ou d'autres éléments tiers. Un couplage étroit de la
+logique métier avec ces systèmes externes complique souvent les tests unitaires en raison de :
 
-Consider the scenario of developing software where your logic is deeply embedded with user interfaces, databases,
-filesystems, or other third-party elements. Such tight coupling of business logic with these external systems often
-complicates unit testing due to:
+1. **Comportement Non Déterministe**: Les systèmes externes peuvent présenter un comportement imprévisible, rendant
+   l'établissement de tests unitaires cohérents difficile.
+2. **Complexité de l'Environnement de Test**: Configurer des environnements de test qui reproduisent des systèmes
+   externes du monde réel peut être complexe et sujet aux erreurs.
+3. **Tests Lents**: Les interactions directes avec des systèmes en direct, tels que les bases de données, peuvent
+   ralentir le processus de test, perturbant le flux de développement.
 
-1. **Non-deterministic Behavior**: External systems can exhibit unpredictable behavior, rendering the establishment of
-   consistent unit tests challenging.
-2. **Test Environment Complexity**: Configuring test environments that replicate real-world external systems can be
-   intricate and prone to errors.
-3. **Slow Tests**: Direct interactions with live systems, such as databases, can decelerate the testing process,
-   causing disruptions in the development workflow.
+### La Solution du Modèle de Conception Humble Object
 
-### The Humble Object Solution
+Le principe fondamental du modèle de conception humble object est le découplage stratégique de la logique complexe des
+interactions externes. Cette bifurcation se traduit par :
 
-The core principle of the Humble Object pattern is the strategic decoupling of intricate logic from external
-interactions. This bifurcation translates into:
+1. **L'Objet Modeste (Humble object)**: Ce composant, maintenu intentionnellement simple, encapsule les interactions avec les systèmes
+   externes. Étant donné sa logique métier minimale, il ne sera pas toujours au centre de tests unitaires rigoureux.
+2. **L'Objet Logique** : C'est là que réside la logique métier principale. Dépourvu de liens externes, il devient
+   intrinsèquement plus testable, ouvrant la voie à des tests unitaires complets qui valident le comportement voulu du
+   logiciel.
 
-1. **The Humble Object**: This component, kept intentionally simple, encapsulates interactions with external systems.
-   Given its minimal business logic, it might not always be the focus of rigorous unit tests.
-2. **The Logic Object**: This is where the core business logic resides. Stripped of external ties, it becomes inherently
-   more testable, paving the way for comprehensive unit tests that validate the software's intended behavior.
+### Avantages
 
-### Benefits at a Glance
+1. **Tests Ciblés** : En distinguant la logique des points de contact externes, les développeurs peuvent se concentrer
+   sur le test de la logique métier fondamentale sans distractions externes.
+2. **Maintenabilité Améliorée** : La démarcation entre la logique et les dépendances externes affine la clarté du code
+   et facilite les efforts de maintenance.
+3. **Scalabilité** : À mesure que le logiciel se développe, cette séparation claire garantit que l'intégration de
+   nouveaux composants externes ou la modification de ceux existants ne nécessite pas de refactoring étendu.
 
-- **Focused Testing**: By distinguishing logic from external touchpoints, developers can zero in on testing the
-  fundamental business logic without external distractions.
-- **Enhanced Maintainability**: The demarcation between logic and external dependencies refines code clarity and eases
-  maintenance efforts.
-- **Scalability**: As the software expands, this clear separation ensures that integrating new external components or
-  modifying existing ones doesn't call for extensive refactoring.
+## Le Modèle de Conception Humble Object en Action
 
-## The Humble Object in Action
+Explorons le modèle de conception *humble object* en construisant une application simple qui récupère des données d'une
+base de données et effectue une certaine logique métier dessus. Nous testerons ensuite cette application en utilisant le
+modèle de conception *humble object*.
 
-Let's explore the Humble Object pattern by building a simple application that fetches data from a database and
-performs some business logic on it. We'll then test this application using the Humble Object pattern.
+### L'Application
 
-### The Application
+Notre application sera un simple programme Go qui récupère des données d'une base de données et effectue une certaine
+logique métier dessus.
 
-Our application will be a simple Go program that fetches data from a database and performs some business logic on it.
+### Le client MongoDB
 
-### The mongo client
-
-We'll use a simple MongoDB database for our application. The database will have a single collection, `users`, with the
-following struct:
+Nous utiliserons une base de données MongoDB simple pour notre application. La base de données aura une seule
+collection, `users`, avec la structure suivante :
 
 ***mongo.go***
 
@@ -115,9 +118,10 @@ func (m *MongoRepo) CreateUser(ctx context.Context, user *User) error {
 }
 ```
 
-### The Application
+### L'Application
 
 ***main.go***
+
 ```go
 package main
 
@@ -149,14 +153,15 @@ func main() {
 }
 ```
 
-## Let's test
+## Passons aux Tests
 
-You've seen that our application works, but how do we test it? We can't just run the application and see if it works. 
-We don't want to connect to a real database in our unit tests.
+Vous avez vu que notre application fonctionne, mais comment la tester ? Nous ne pouvons pas simplement exécuter
+l'application et voir si elle fonctionne. Nous ne voulons pas nous connecter à une vraie base de données dans nos tests
+unitaires.
 
-### The Problem
+### Le Problème
 
-Let's start by writing a test for the `CreateUser` function:
+Commençons par écrire un test pour la fonction `CreateUser` :
 
 ***mongo_test.go***
 
@@ -164,33 +169,33 @@ Let's start by writing a test for the `CreateUser` function:
 package main
 
 import (
-    "context"
-    "testing"
+	"context"
+	"testing"
 )
 
 func TestMongoRepo_CreateUser(t *testing.T) {
-    ctx := context.Background()
+	ctx := context.Background()
 
-    repo, err := NewMongoRepo(ctx, "mongodb://localhost:27017")
-    if err != nil {
-        t.Fatalf("error creating mongo repo: %s", err)
-    }
+	repo, err := NewMongoRepo(ctx, "mongodb://localhost:27017")
+	if err != nil {
+		t.Fatalf("error creating mongo repo: %s", err)
+	}
 
-    user := &User{
-        ID:         primitive.NewObjectID(),
-        Name:     "John",
-        Email:    "john@example.com",
-        Password: "password",
-    }
+	user := &User{
+		ID:       primitive.NewObjectID(),
+		Name:     "John",
+		Email:    "john@example.com",
+		Password: "password",
+	}
 
-    err = repo.CreateUser(ctx, user)
-    if err != nil {
-        t.Fatalf("error creating user: %s", err)
-    }
+	err = repo.CreateUser(ctx, user)
+	if err != nil {
+		t.Fatalf("error creating user: %s", err)
+	}
 }
 ```
 
-If you run the test, you'll see that it fails:
+Si vous exécutez le test, vous verrez qu'il échoue :
 
 ```bash
 $ go test -v -run TestMongoRepo_CreateUser
@@ -202,74 +207,81 @@ exit status 1
 FAIL    github.com/tclaudel/blog-tclaudel/content/posts/test_with_external_dependency   30.008s
 ```
 
-The test fails because it can't connect to the database. We don't want to connect to a real database in our unit tests.
-We need to mock the database.
+Le test échoue car il ne peut pas se connecter à la base de données. Nous ne voulons pas nous connecter à une vraie base
+de données dans nos tests unitaires. Nous devons simuler la base de données.
 
-### Decoupling With Interfaces
+### Découplage Avec des Interfaces
 
-To mock the database, we need to decouple our code from the database calls. We can do this by using an interface, let's 
-see which calls we need to mock:
+Pour simuler la base de données, nous devons découpler notre code des appels à la base de données. Nous pouvons le faire
+en utilisant une interface, voyons quels appels nous devons simuler :
 
 ```go
 func (m *MongoRepo) CreateUser(ctx context.Context, user *User) error {
-    _, err := m.collection.InsertOne(ctx, user) // <-- Database call
-    if err != nil {
-        return fmt.Errorf("%w: %s", ErrInsertingUser, err)
-    }
+_, err := m.collection.InsertOne(ctx, user) // <-- Database call
+if err != nil {
+return fmt.Errorf("%w: %s", ErrInsertingUser, err)
+}
 
-    return nil
+return nil
 }
 ```
 
-We can create an interface that contains these two methods:
+Nous pouvons créer une interface qui contient ces deux méthodes :
 
 ***mongo.go***
+
 ```go
 type MongoCaller interface {
-    InsertOne(ctx context.Context, document interface{}, opts ...*options.InsertOneOptions) (
-        *mongo.InsertOneResult, error)
+InsertOne(ctx context.Context, document interface{}, opts ...*options.InsertOneOptions) (
+*mongo.InsertOneResult, error)
 }
 ```
 
-We can then change our `MongoRepo` to use this struct instead of the `mongo.Collection`:
+Nous pouvons ensuite modifier notre `MongoRepo` pour utiliser cette structure au lieu de `mongo.Collection` :
+
 ***mongo.go***
+
 ```go
 type MongoRepo struct {
-    mongoCaller MongoCaller
+mongoCaller MongoCaller
 }
 ```
-Modify the NewMongoRepo function to use the `mongoCaller` field:
+
+Modifiez la fonction `NewMongoRepo` pour utiliser le champ `mongoCaller` :
 ***mongo.go***
+
 ```go
 // [...]
 func NewMongoRepo(ctx context.Context, mongoURI string) (*MongoRepo, error) {
-    const (
-        dbName         = "test"
-        collectionName = "users"
-    )
-    
-    client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
-    if err != nil {
-        return nil, fmt.Errorf("%w: %s", ErrConnectingToMongoDatabase, err)
-    }
-    
-    collection := client.Database(dbName).Collection(collectionName)
-    
-    return &MongoRepo{
-        mongoCaller: collection,
-    }, nil
+const (
+dbName = "test"
+collectionName = "users"
+)
+
+client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+if err != nil {
+return nil, fmt.Errorf("%w: %s", ErrConnectingToMongoDatabase, err)
+}
+
+collection := client.Database(dbName).Collection(collectionName)
+
+return &MongoRepo{
+mongoCaller: collection,
+}, nil
 }
 // [...]
 ```
-You have nothing to change in the `NewMongoRepo` function, it still returns a `MongoRepo` that implements the
-`MongoCaller` interface.
 
-Let's create a mock for this interface:
+Vous n'avez rien à changer dans la fonction `NewMongoRepo`, elle retourne toujours un `MongoRepo` qui implémente
+l'interface `MongoCaller`.
 
-We implement the `InsertOne` method. Our Implementation will be very simple we will just return the ID of
-the user we want to insert:
+Créons maintenant un faux pour cette interface :
+
+Nous implémentons la méthode `InsertOne`. Notre implémentation sera très simple, nous allons simplement retourner l'ID
+de l'utilisateur que nous voulons insérer :
 
 ***mongo_mock.go***
+
 ```go
 package main
 
@@ -304,30 +316,31 @@ func (m MockMongo) InsertOne(ctx context.Context, document interface{}, opts ...
 }
 ```
 
-We can now use this mock in our test:
+Nous pouvons maintenant utiliser ce faux dans notre test :
 
 ***mongo_test.go***
+
 ```go
 func TestMongoRepo_CreateUser(t *testing.T) {
-	ctx := context.Background()
+ctx := context.Background()
 
-	repo := NewMockMongo()
+repo := NewMockMongo()
 
-	user := &User{
-		ID:       primitive.NewObjectID(),
-		Name:     "John",
-		Email:    "john@example.com",
-		Password: "password",
-	}
+user := &User{
+ID:       primitive.NewObjectID(),
+Name:     "John",
+Email:    "john@example.com",
+Password: "password",
+}
 
-	err := repo.CreateUser(ctx, user)
-	if err != nil {
-		t.Fatalf("error creating user: %s", err)
-	}
+err := repo.CreateUser(ctx, user)
+if err != nil {
+t.Fatalf("error creating user: %s", err)
+}
 }
 ```
 
-If you run the test, you'll see that it passes:
+Si vous exécutez le test, vous verrez qu'il réussit :
 
 ```bash
 $ go test -v -run TestMongoRepo_CreateUser
@@ -338,9 +351,10 @@ PASS
 ok      github.com/tclaudel/blog-tclaudel/content/posts/test_with_external_dependency   0.005s
 ```
 
-Let's implement an errorous mock to make our test fail:
+Implémentons maintenant un faux erroné pour que notre test échoue :
 
 ***mongo_mock.go***
+
 ```go
 package main
 
@@ -385,28 +399,31 @@ func (m MockMongo) InsertOne(ctx context.Context, document interface{}, opts ...
 }
 ```
 
-Let's write another test to make sure that our code handles errors correctly:
+Écrivons un autre test pour nous assurer que notre code gère correctement les erreurs :
 
 ***mongo_test.go***
+
 ```go
  // [...]
 func TestMongoRepo_CreateUserError(t *testing.T) {
-    ctx := context.Background()
-    
-    repo := NewMockMongo()
-    
-    user := &User{
-        ID:       primitive.NewObjectID(),
-        Name:     "John",
-        Email:    emailWhichTriggersError,
-        Password: "password",
-    }
-    
-    err := repo.CreateUser(ctx, user)
-    assert.ErrorIs(t, err, ErrInsertingUser)
+ctx := context.Background()
+
+repo := NewMockMongo()
+
+user := &User{
+ID:       primitive.NewObjectID(),
+Name:     "John",
+Email:    emailWhichTriggersError,
+Password: "password",
+}
+
+err := repo.CreateUser(ctx, user)
+assert.ErrorIs(t, err, ErrInsertingUser)
 }
 ```
+
 Run the test :
+
 ```bash
 $ go test -v -run TestMongoRepo_CreateUserError
 === RUN   TestMongoRepo_CreateUserError
@@ -417,6 +434,9 @@ ok      github.com/tclaudel/blog-tclaudel/content/posts/test_with_external_depen
 
 ## Conclusion
 
-The Humble Object pattern is a powerful tool for decoupling intricate logic from external dependencies. This separation
-allows developers to focus on testing the core business logic without the distractions of external systems. The
-resulting tests are more reliable, maintainable, and scalable.
+Le modèle de conception *humble object* est un outil puissant pour découpler la logique complexe des dépendances externes.
+Cette séparation permet aux développeurs de se concentrer sur le test de la logique
+
+### Sources :
+- https://martinfowler.com/bliki/HumbleObject.html
+- http://xunitpatterns.com/Humble%20Object.html

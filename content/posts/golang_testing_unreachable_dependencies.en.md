@@ -9,6 +9,8 @@ In the evolving landscape of software development, the need for code reliability
 consistent hurdle developers encounter is the intricate task of unit testing code entangled with external components. To
 address this, the software community has introduced a promising solution: The Humble Object design pattern.
 
+> Code example here : https://github.com/tclaudel/blog-tclaudel/tree/main/content/posts/test_with_external_dependency
+
 ### The Problem: Code Intertwined with External Dependencies
 
 Consider the scenario of developing software where your logic is deeply embedded with user interfaces, databases,
@@ -419,6 +421,8 @@ ok      github.com/tclaudel/blog-tclaudel/content/posts/test_with_external_depen
 The Humble Object pattern is a powerful tool for decoupling intricate logic from external dependencies. This separation
 allows developers to focus on testing the core business logic without the distractions of external systems. The
 resulting tests are more reliable, maintainable, and scalable.
+
+> Code example here : https://github.com/tclaudel/blog-tclaudel/tree/main/content/posts/test_with_external_dependency
 
 ## Sources :
 - https://martinfowler.com/bliki/HumbleObject.html

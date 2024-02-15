@@ -10,6 +10,8 @@ Un obstacle constant auquel les développeurs sont confrontés est la tâche com
 imbriqué avec des composants externes. Pour remédier à cela, la communauté logicielle a introduit une solution
 prometteuse : le modèle de conception *humble object*.
 
+> Code d'exemple ici: https://github.com/tclaudel/blog-tclaudel/tree/main/content/posts/test_with_external_dependency
+
 ### Le Problème : Code Entremêlé avec des Dépendances Externes
 
 Considérez le scénario du développement logiciel où votre logique est profondément intégrée avec des interfaces
@@ -436,6 +438,8 @@ ok      github.com/tclaudel/blog-tclaudel/content/posts/test_with_external_depen
 
 Le modèle de conception *humble object* est un outil puissant pour découpler la logique complexe des dépendances externes.
 Cette séparation permet aux développeurs de se concentrer sur le test de la logique
+
+> Code d'exemple ici: https://github.com/tclaudel/blog-tclaudel/tree/main/content/posts/test_with_external_dependency
 
 ### Sources :
 - https://martinfowler.com/bliki/HumbleObject.html
